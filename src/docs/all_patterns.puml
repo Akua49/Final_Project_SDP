@@ -1,0 +1,90 @@
+@startuml AllPatterns
+
+package "Creational Patterns" {
+  package "Builder" {
+    class OrderBuilder {
+      + setCustomerName()
+      + addItem()
+      + build()
+    }
+    class Order {
+      + showOrder()
+    }
+    OrderBuilder --> Order : creates
+  }
+
+  package "Abstract Factory" {
+    interface Product {
+      + getName()
+      + getPrice()
+    }
+    class Food implements Product
+    class Drink implements Product
+    abstract class AbstractFactory {
+      + getProduct()
+    }
+    class FoodFactory extends AbstractFactory
+    class DrinkFactory extends AbstractFactory
+    class FactoryProducer {
+      + getFactory()
+    }
+  }
+}
+
+package "Structural Patterns" {
+  package "Bridge" {
+    interface PaymentSystem {
+      + processPayment()
+    }
+    class SimplePaymentSystem implements PaymentSystem
+    abstract class PaymentMethod {
+      + pay()
+    }
+    class CashPayment extends PaymentMethod
+    class OnlinePayment extends PaymentMethod
+    PaymentMethod --> PaymentSystem : uses
+  }
+
+  package "Adapter" {
+    class OldPrinter {
+      + printOld()
+    }
+    interface NewPrinter {
+      + print()
+    }
+    class ReceiptAdapter implements NewPrinter
+    ReceiptAdapter --> OldPrinter : adapts
+  }
+}
+
+package "Behavioral Patterns" {
+  package "Strategy" {
+    interface DiscountStrategy {
+      + applyDiscount()
+    }
+    class NoDiscount implements DiscountStrategy
+    class PercentageDiscount implements DiscountStrategy
+    class FixedDiscount implements DiscountStrategy
+    class DiscountContext {
+      + setDiscountStrategy()
+      + apply()
+    }
+    DiscountContext --> DiscountStrategy : uses
+  }
+
+  package "Observer" {
+    interface Observer {
+      + update()
+    }
+    interface Subject {
+      + addObserver()
+      + removeObserver()
+      + notifyObservers()
+    }
+    class Customer implements Observer
+    class Restaurant implements Subject
+    Restaurant --> Observer : notifies
+  }
+}
+
+@enduml
