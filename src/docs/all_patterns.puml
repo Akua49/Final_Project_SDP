@@ -1,90 +1,92 @@
-@startuml AllPatterns
+# UML Diagrams for Design Patterns
 
-package "Creational Patterns" {
-  package "Builder" {
+## 1. Общая архитектура системы
+
+```mermaid
+classDiagram
+    %% Creational Patterns
     class OrderBuilder {
-      + setCustomerName()
-      + addItem()
-      + build()
+        -customerName: String
+        -items: List~String~
+        -totalPrice: double
+        +setCustomerName(String) OrderBuilder
+        +addItem(String, double) OrderBuilder
+        +build() Order
     }
+    
     class Order {
-      + showOrder()
+        -customerName: String
+        -items: List~String~
+        -totalPrice: double
+        +showOrder() void
     }
-    OrderBuilder --> Order : creates
-  }
-
-  package "Abstract Factory" {
-    interface Product {
-      + getName()
-      + getPrice()
+    
+    class AbstractFactory {
+        <<abstract>>
+        +getProduct(String) Product
     }
-    class Food implements Product
-    class Drink implements Product
-    abstract class AbstractFactory {
-      + getProduct()
+    
+    class FoodFactory {
+        +getProduct(String) Product
     }
-    class FoodFactory extends AbstractFactory
-    class DrinkFactory extends AbstractFactory
-    class FactoryProducer {
-      + getFactory()
+    
+    class DrinkFactory {
+        +getProduct(String) Product
     }
-  }
-}
-
-package "Structural Patterns" {
-  package "Bridge" {
-    interface PaymentSystem {
-      + processPayment()
+    
+    %% Structural Patterns
+    class PaymentSystem {
+        <<interface>>
+        +processPayment(String, double) void
     }
-    class SimplePaymentSystem implements PaymentSystem
-    abstract class PaymentMethod {
-      + pay()
+    
+    class SimplePaymentSystem {
+        +processPayment(String, double) void
     }
-    class CashPayment extends PaymentMethod
-    class OnlinePayment extends PaymentMethod
-    PaymentMethod --> PaymentSystem : uses
-  }
-
-  package "Adapter" {
-    class OldPrinter {
-      + printOld()
+    
+    class PaymentMethod {
+        <<abstract>>
+        #system: PaymentSystem
+        +pay(double) void
     }
-    interface NewPrinter {
-      + print()
+    
+    class CashPayment {
+        +pay(double) void
     }
-    class ReceiptAdapter implements NewPrinter
-    ReceiptAdapter --> OldPrinter : adapts
-  }
-}
-
-package "Behavioral Patterns" {
-  package "Strategy" {
-    interface DiscountStrategy {
-      + applyDiscount()
+    
+    class OnlinePayment {
+        +pay(double) void
     }
-    class NoDiscount implements DiscountStrategy
-    class PercentageDiscount implements DiscountStrategy
-    class FixedDiscount implements DiscountStrategy
+    
+    class ReceiptAdapter {
+        -oldPrinter: OldPrinter
+        +print(String) void
+    }
+    
+    %% Behavioral Patterns
+    class DiscountStrategy {
+        <<interface>>
+        +applyDiscount(double) double
+    }
+    
     class DiscountContext {
-      + setDiscountStrategy()
-      + apply()
+        -discountStrategy: DiscountStrategy
+        +setDiscountStrategy(DiscountStrategy) void
+        +apply(double) double
     }
+    
+    class Restaurant {
+        -customers: List~Observer~
+        +addObserver(Observer) void
+        +removeObserver(Observer) void
+        +notifyObservers(String) void
+    }
+    
+    %% Relationships
+    OrderBuilder --> Order : creates
+    FoodFactory --> AbstractFactory : extends
+    PaymentMethod --> PaymentSystem : uses
+    ReceiptAdapter ..|> NewPrinter : implements
     DiscountContext --> DiscountStrategy : uses
-  }
-
-  package "Observer" {
-    interface Observer {
-      + update()
-    }
-    interface Subject {
-      + addObserver()
-      + removeObserver()
-      + notifyObservers()
-    }
-    class Customer implements Observer
-    class Restaurant implements Subject
     Restaurant --> Observer : notifies
-  }
-}
-
-@enduml
+```
